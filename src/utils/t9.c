@@ -18,24 +18,6 @@ BANKREF_EXTERN(dictionary_29)
 BANKREF_EXTERN(dictionary_30)
 BANKREF_EXTERN(dictionary_31)
 
-#define MAX_STACK (DICTIONARY_MAX_WORD_SIZE * 2 + 1)
-#define DICTIONARY_NODE_SIZE 6
-#define T9_NODE_SIZE DICTIONARY_NODE_SIZE + DICTIONARY_MAX_WORD_SIZE + 1
-
-typedef struct DictionaryNode {
-    char c;
-    uint16_t children;
-    uint8_t child_count;
-    uint8_t complete;
-    uint8_t score;
-} DictionaryNode;
-
-typedef struct T9Node {
-    DictionaryNode dictionary_node;
-    uint8_t depth;
-    char value[DICTIONARY_MAX_WORD_SIZE];
-} T9Node;
-
 void get_node(DictionaryNode* node, uint16_t index) {
     uint8_t save = CURRENT_BANK;
 
@@ -43,26 +25,26 @@ void get_node(DictionaryNode* node, uint16_t index) {
 
     if(index < DICTIONARY_NODE_COUNT_31) {
         SWITCH_ROM(BANK(dictionary_31));
-        dictionary_tree = dictionary_tree_31;
+        dictionary_tree = (uint8_t*)dictionary_tree_31;
     } else if(index < DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30) {
         SWITCH_ROM(BANK(dictionary_30));
-        dictionary_tree = dictionary_tree_30;
+        dictionary_tree = (uint8_t*)dictionary_tree_30;
         index -= DICTIONARY_NODE_COUNT_31;
     } else if(index < DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30 + DICTIONARY_NODE_COUNT_29) {
         SWITCH_ROM(BANK(dictionary_29));
-        dictionary_tree = dictionary_tree_29;
+        dictionary_tree = (uint8_t*)dictionary_tree_29;
         index -= DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30;
     } else if(index < DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30 + DICTIONARY_NODE_COUNT_29 + DICTIONARY_NODE_COUNT_28) {
         SWITCH_ROM(BANK(dictionary_28));
-        dictionary_tree = dictionary_tree_28;
+        dictionary_tree = (uint8_t*)dictionary_tree_28;
         index -= DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30 + DICTIONARY_NODE_COUNT_29;
     } else if(index < DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30 + DICTIONARY_NODE_COUNT_29 + DICTIONARY_NODE_COUNT_28 + DICTIONARY_NODE_COUNT_27) {
         SWITCH_ROM(BANK(dictionary_27));
-        dictionary_tree = dictionary_tree_27;
+        dictionary_tree = (uint8_t*)dictionary_tree_27;
         index -= DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30 + DICTIONARY_NODE_COUNT_29 + DICTIONARY_NODE_COUNT_28;
     } else if(index < DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30 + DICTIONARY_NODE_COUNT_29 + DICTIONARY_NODE_COUNT_28 + DICTIONARY_NODE_COUNT_27 + DICTIONARY_NODE_COUNT_26) {
         SWITCH_ROM(BANK(dictionary_26));
-        dictionary_tree = dictionary_tree_26;
+        dictionary_tree = (uint8_t*)dictionary_tree_26;
         index -= DICTIONARY_NODE_COUNT_31 + DICTIONARY_NODE_COUNT_30 + DICTIONARY_NODE_COUNT_29 + DICTIONARY_NODE_COUNT_28 + DICTIONARY_NODE_COUNT_27;
     }
 
@@ -80,15 +62,52 @@ void get_node(DictionaryNode* node, uint16_t index) {
     SWITCH_ROM(save);
 }
 
-void t9_algorithm(char* val, uint8_t size) {
+void t9_letter_to_number(char* val, uint8_t size) {
+    for(uint8_t i = 0; i < size; i++) {
+        // to lower
+        if(val[i] >= 'A' && val[i] <= 'Z') {
+            val[i] += 'a' - 'A';
+        }
 
+        if(val[i] >= 'a' && val[i] <= 'z') {
+            val[i] -= 'a' + (val[i] > 'p') + (val[i] > 'w');
+            val[i] /= 3;
+            val[i] += '2';
+        }
+    }
+}
+
+void insert_result(T9Results* results, T9Result* result) {
+    if(results->result_count < MAX_T9_RESULTS) {
+        results->results[results->result_count].score = 0;
+        results->result_count++;
+    } else if(result->score <= results->results[results->result_count - 1].score) {
+        return;
+    }
+
+    uint8_t i;
+
+    for (i = results->result_count - 1; i > 0; i--) {
+        if (result->score > results->results[i - 1].score) {
+            memcpy(&results->results[i], &results->results[i - 1], T9_RESULT_SIZE);
+        } else {
+            break;
+        }
+    }
+
+    memcpy(&results->results[i], result, T9_RESULT_SIZE);
+
+    if (results->result_count > MAX_T9_RESULTS) {
+        results->result_count = MAX_T9_RESULTS;
+    }
+}
+
+
+void t9_algorithm(char* val, uint8_t size, T9Results* results) {
+    t9_letter_to_number(val, size);
 
     uint16_t stack_tail = 0;
     T9Node stack[MAX_STACK];
-
-    uint8_t found = 0;
-    T9Node solution;
-    solution.dictionary_node.score = 0;
 
     uint8_t key = val[0] - '2';
     uint8_t letter_count = 3 + (key == 5 || key == 7);
@@ -112,9 +131,15 @@ void t9_algorithm(char* val, uint8_t size) {
         }
 
         if(parent.depth == size) {
-            if(parent.dictionary_node.complete && parent.dictionary_node.score >= solution.dictionary_node.score) {
-                found = 1;
-                memcpy(&solution, &parent, T9_NODE_SIZE);
+            if(parent.dictionary_node.complete) {
+                T9Result result = {
+                    .score = parent.dictionary_node.complete ? parent.dictionary_node.score : 0,
+                };
+
+                memcpy(&result.value, &parent.value, size);
+                result.value[size] = '\0';
+
+                insert_result(results, &result);
             }
 
             continue;
@@ -153,10 +178,6 @@ void t9_algorithm(char* val, uint8_t size) {
             stack[stack_tail].value[parent.depth] = next_char;
             stack_tail++;
         }
-    }
-
-    if(found) {
-        memcpy(val, solution.value, size);
     }
 }
 

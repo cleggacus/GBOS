@@ -34,33 +34,33 @@ uint8_t validate_time_buffer(char* buffer) {
 }
 
 void show_keyboard(void) {
-    keyboard.props = KEYBOARD_NUMBER;
-    keyboard.buffer = time_input_buffer;
-    keyboard.buffer_size = 6;
-    keyboard.empty_char = '0';
-    keyboard.validator = validate_time_buffer;
-    keyboard.cursor = 0;
+    // keyboard.props = KEYBOARD_NUMBER;
+    // keyboard.buffer = time_input_buffer;
+    // keyboard.buffer_size = 6;
+    // keyboard.empty_char = '0';
+    // keyboard.validator = validate_time_buffer;
+    // keyboard.cursor = 0;
     init_keyboard();
 }
 
 void render_time_settings(void) {
-    current_palette = (keyboard.cursor == 0) << 1;
-    uint8_t* addr = printc_xy(time_input_buffer[0], 6, 6);
-    current_palette = (keyboard.cursor == 1) << 1;
-    addr = printc(time_input_buffer[1], addr);
-    current_palette = 0;
-    addr = printc(':', addr);
-    current_palette = (keyboard.cursor == 2) << 1;
-    addr = printc(time_input_buffer[2], addr);
-    current_palette = (keyboard.cursor == 3) << 1;
-    addr = printc(time_input_buffer[3], addr);
-    current_palette = 0;
-    addr = printc(':', addr);
-    current_palette = (keyboard.cursor == 4) << 1;
-    addr = printc(time_input_buffer[4], addr);
-    current_palette = (keyboard.cursor == 5) << 1;
-    addr = printc(time_input_buffer[5], addr);
-    current_palette = 0;
+    // current_palette = (keyboard.cursor == 0) << 1;
+    // uint8_t* addr = printc_xy(time_input_buffer[0], 6, 6);
+    // current_palette = (keyboard.cursor == 1) << 1;
+    // addr = printc(time_input_buffer[1], addr);
+    // current_palette = 0;
+    // addr = printc(':', addr);
+    // current_palette = (keyboard.cursor == 2) << 1;
+    // addr = printc(time_input_buffer[2], addr);
+    // current_palette = (keyboard.cursor == 3) << 1;
+    // addr = printc(time_input_buffer[3], addr);
+    // current_palette = 0;
+    // addr = printc(':', addr);
+    // current_palette = (keyboard.cursor == 4) << 1;
+    // addr = printc(time_input_buffer[4], addr);
+    // current_palette = (keyboard.cursor == 5) << 1;
+    // addr = printc(time_input_buffer[5], addr);
+    // current_palette = 0;
 }
 
 void init_time_settings(void) {
@@ -92,13 +92,13 @@ void init_time_settings(void) {
 void update_time_settings(void) {
     update_date_time_bar(&default_date_time_bar);
 
-    uint8_t update = update_keyboard();
+    KeyboardOperationType update = update_keyboard();
 
     if(update) {
         render_time_settings();
     }
 
-    if(update == KEYBOARD_UPDATE_COMPLETE) {
+    if(update == KEYBOARD_COMPLETE) {
         set_time_to_buffer();
         next_state = STATE_SETTINGS;
     }

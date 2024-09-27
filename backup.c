@@ -11,7 +11,7 @@ KeyboardState keyboard_state;
 uint8_t key_x = 1;
 uint8_t key_y = 0;
 
-char keyboard_layout[3][20] = {
+char keyboard_layout[3][21] = {
     " q w e r t y u i o p",
     "  a s d f g h j k l ",
     "   z x c v b n m    "
@@ -63,7 +63,7 @@ void render_keyboard(void) {
             print_xy("                    ", 0, DEVICE_SCREEN_HEIGHT - 4);
             print_xy("   z x c v b n m    ", 0, DEVICE_SCREEN_HEIGHT - 3);
             print_xy("                    ", 0, DEVICE_SCREEN_HEIGHT - 2);
-            set_palette_xy(0, key_x, DEVICE_SCREEN_HEIGHT - 7 + key_y * 2);
+            // set_palette_xy(0, key_x, DEVICE_SCREEN_HEIGHT - 7 + key_y * 2);
 
             printc_xy('>', key_x-1, DEVICE_SCREEN_HEIGHT - 7 + key_y * 2);
             break;
@@ -427,19 +427,21 @@ KeyboardOperationType update_keyboard(void) {
     switch(keyboard_state.type) {
         case KEYBOARD_T9_PREDICTIVE: {
             update_keyboard_t9_predictive(&operation);
+            proccess_operation(&operation);
             break;
         }
         case KEYBOARD_QWERTY: {
             update_keyboard_qwerty(&operation);
+            proccess_operation(&operation);
             break;
         }
         case KEYBOARD_NUM: {
             update_keyboard_num(&operation);
+            proccess_operation(&operation);
             break;
         }
     }
 
-    proccess_operation(&operation);
 
     return operation.type;
 }

@@ -122,9 +122,6 @@ def generate_c_file(input_file, output_file_prefix, num_files):
             word = line.strip()
             score = math.floor(0b111111 * (1 - i / dictionary_size))
 
-            if word == "mm" or word == "no":
-                print(i, word, score)
-
             if len(word) > max_word_size:
                 max_word_size = len(word)
 

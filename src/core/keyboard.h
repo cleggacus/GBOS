@@ -1,41 +1,48 @@
-#ifndef KEYBAORD_H
-#define KEYBAORD_H
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
 
 #include <stdint.h>
+#include "../utils/dictionary.h"
 
-#define KEYBOARD_ALPHABET       0b00000001
-#define KEYBOARD_NUMBER         0b00000010
-#define KEYBOARD_PUNCTUATION    0b00000100
+typedef enum KeyboardType {
+    KEYBOARD_T9_PREDICTIVE,
+    KEYBOARD_QWERTY,
+    KEYBOARD_NUM,
+} KeyboardType;
 
-typedef enum KeyboardUpdate {
-    KEYBOARD_UPDATE_NONE = 0,
-    KEYBOARD_UPDATE,
-    KEYBOARD_UPDATE_NEXT,
-    KEYBOARD_UPDATE_FORWARD,
-    KEYBOARD_UPDATE_BACKWARD,
-    KEYBOARD_UPDATE_COMPLETE,
-    KEYBOARD_UPDATE_CYCLE_MODE,
-} KeyboardUpdate;
+#define KEYBOARD_TYPE_COUNT (KEYBOARD_NUM + 1)
 
-typedef enum KeyboardMode {
-    ALPHABET_MODE,
-    NUMBER_MODE,
-    PUNCTUATION_MODE,
-} KeyboardMode;
+typedef enum KeyboardOperationType {
+    KEYBOARD_NONE = 0,
+    KEYBOARD_INSERT_CHAR,
+    KEYBOARD_BACKSPACE_WORD,
+    KEYBOARD_NEXT_T9_WORD,
+    KEYBOARD_PREV_T9_WORD,
+    KEYBOARD_NEXT_LETTER,
+    KEYBOARD_PREV_LETTER,
+    KEYBOARD_UP,
+    KEYBOARD_DOWN,
+    KEYBOARD_LEFT,
+    KEYBOARD_RIGHT,
+    KEYBOARD_COMPLETE,
+} KeyboardOperationType;
 
-typedef struct Keyboard {
-    uint8_t props;
-    KeyboardMode mode;
-    uint8_t cursor;
-    char empty_char;
+typedef struct KeyboardOperation {
+    KeyboardOperationType type;
+    char value; // for insert
+} KeyboardOperation;
+
+typedef struct KeyboardState {
+    // general variables
+    KeyboardType type;
+    uint8_t cursor_pos;
+    char *buffer;
     uint8_t buffer_size;
-    uint8_t (*validator)(char*);
-    char* buffer;
-} Keyboard;
+} KeyboardState;
 
-extern Keyboard keyboard;
+extern KeyboardState keyboard_state;
 
 void init_keyboard(void);
-uint8_t update_keyboard(void);
+KeyboardOperationType update_keyboard(void);
 
 #endif

@@ -18,9 +18,9 @@ const palette_color_t palettes[8][4] = {
     },
     {
         RGB8(255,255,255),
-        RGB8( 205, 205, 205),
-        RGB8( 155, 155, 155),
-        RGB8(  105,  105,105) // red
+        RGB8(198,198,198),
+        RGB8(141,141,141),
+        RGB8( 85, 85, 85) // red
     },
     {
         RGB8(  0,  0,  0),
@@ -80,6 +80,12 @@ inline uint8_t* printc(char c, uint8_t* addr) {
     VBK_REG = VBK_TILES;
     set_vram_byte(addr, c + FONT_REG_START - FONT_CHAR_OFFSET);
     return addr+1;
+}
+
+inline void set_palette_xy(uint8_t palette, uint8_t x, uint8_t y) {
+    VBK_REG = VBK_ATTRIBUTES;
+    set_bkg_tile_xy(x, y, palette); // palette
+    VBK_REG = VBK_TILES;
 }
 
 inline uint8_t* printc_xy(char c, uint8_t x, uint8_t y) {

@@ -3,23 +3,29 @@
 #include "../components/date_time_bar.h"
 #include "state.h"
 #include "../core/print.h"
+#include <stdint.h>
+#include <string.h>
 
-#define NOTEPAD_INPUT_BUFFER_SIZE 19
+#define NOTEPAD_INPUT_BUFFER_SIZE 18
 
-char notepad_input_buffer[NOTEPAD_INPUT_BUFFER_SIZE] = "                  ";
+char notepad_input_buffer[NOTEPAD_INPUT_BUFFER_SIZE] = {0};
 
 void show_notepad_keyboard(void) {
-    keyboard.props = KEYBOARD_NUMBER | KEYBOARD_ALPHABET;
-    keyboard.buffer = notepad_input_buffer;
-    keyboard.buffer_size = NOTEPAD_INPUT_BUFFER_SIZE;
-    keyboard.empty_char = ' ';
-    keyboard.validator = 0;
-    keyboard.cursor = 0;
+    keyboard_state.buffer = notepad_input_buffer;
+    keyboard_state.buffer_size = NOTEPAD_INPUT_BUFFER_SIZE;
+    keyboard_state.type = 0;
+    keyboard_state.cursor_pos = 0;
+
     init_keyboard();
 }
 
 void render_notepad(void) {
+    uint8_t len = strlen(notepad_input_buffer);
     print_xy(notepad_input_buffer, 1, 6);
+
+    for(uint8_t i = len; i < NOTEPAD_INPUT_BUFFER_SIZE; i++) {
+        printc_xy(' ', 1 + i, 6);
+    }
 }
 
 void init_notepad(void) {
@@ -43,13 +49,13 @@ void init_notepad(void) {
 void update_notepad(void) {
     update_date_time_bar(&default_date_time_bar);
 
-    uint8_t update = update_keyboard();
+    uint8_t operation_type = update_keyboard();
 
-    if(update) {
+    if(operation_type) {
         render_notepad();
     }
 
-    if(update == KEYBOARD_UPDATE_COMPLETE) {
+    if(operation_type == KEYBOARD_COMPLETE) {
         next_state = STATE_START_MENU;
     }
 }
