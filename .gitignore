@@ -1,3 +1,31 @@
-# Output directories
-/obj
+# Build output
+/obj/
 /obj/*
+
+# ccls cache
+/.ccls-cache/
+/.ccls-cache/*
+
+# Compilation database
+/compile_commands.json
+
+# Vim swap and backup files
+*.swp
+*.swo
+*.bak
+
+# Backup files (common editors)
+*~
+*.backup
+
+# Temporary files
+*.tmp
+
+# Logs
+*.log
+
+# MacOS metadata (if relevant)
+.DS_Store
+
+# Nix-specific build results (optional, if you have nix build output dirs)
+result

@@ -21,6 +21,7 @@ endif
 LCCFLAGS += -Wl-yt0x10
 LCCFLAGS += -autobank
 LCCFLAGS += -Wm-yc
+LCCFLAGS += -I$(GBDK_HOME)/include
 
 # You can set the name of the .gb ROM file here
 PROJECTNAME    = GBOS
@@ -33,7 +34,7 @@ CSOURCES    = $(foreach dir,$(SRCDIR),$(wildcard $(dir)/*.c)) $(foreach dir,$(RE
 ASMSOURCES  = $(foreach dir,$(SRCDIR),$(wildcard $(dir)/*.s))
 OBJS        = $(patsubst %.c,$(OBJDIR)/%.o,$(CSOURCES)) $(patsubst %.s,$(OBJDIR)/%.o,$(ASMSOURCES))
 
-all: prepare $(BINS)
+all: prepare $(BINS) generate_compile_commands
 
 compile.bat: Makefile
 	@echo "REM Automatically generated from Makefile" > compile.bat
@@ -60,6 +61,9 @@ $(BINS): $(OBJS)
 
 prepare:
 	mkdir -p $(OBJDIR)
+
+generate_compile_commands:
+	GBDK_HOME=$(GBDK_HOME) sh generate_compile_commands.sh
 
 clean:
 	rm -rf $(OBJDIR)/*
