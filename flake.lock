@@ -1,0 +1,60 @@
+{
+  "nodes": {
+    "gbdk": {
+      "inputs": {
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1754431873,
+        "narHash": "sha256-HmxvDyCQ8QFB4L//qdmY01+VG24O8ypjm4BIdD6nbQA=",
+        "owner": "cleggacus",
+        "repo": "nix-gbdk-2020",
+        "rev": "ae589f629d154613e1aee572610794fb245f0e15",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cleggacus",
+        "repo": "nix-gbdk-2020",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1754430910,
+        "narHash": "sha256-iB9RQiAVOn1CGHVRhjtjgHdv3FO30MlBYENnzUQH0OQ=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "a7219a253b4a508e030b413644e56f83f96fd9bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1754430910,
+        "narHash": "sha256-iB9RQiAVOn1CGHVRhjtjgHdv3FO30MlBYENnzUQH0OQ=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "a7219a253b4a508e030b413644e56f83f96fd9bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "gbdk": "gbdk",
+        "nixpkgs": "nixpkgs_2"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
